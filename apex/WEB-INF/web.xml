@@ -56,7 +56,7 @@
     </init-param>
 	<init-param>
         <param-name>mapping.5.type</param-name>
-        <param-value>contains</param-value>
+        <param-value>prefix</param-value>
     </init-param>
     <init-param>
         <param-name>mapping.5.path</param-name>
