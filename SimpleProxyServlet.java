@@ -13,21 +13,11 @@ public class SimpleProxyServlet extends HttpServlet {
     }
 
     private List<Mapping> mappings;
-    private String defaultUrl;
 
     @Override
     public void init() throws ServletException {
         mappings = new ArrayList<>();
-        defaultUrl = getServletConfig().getInitParameter("defaultUrl");
         String baseUrl = getServletConfig().getInitParameter("baseUrl");
-
-        if (defaultUrl == null) {
-            throw new ServletException("defaultUrl init-param not configured");
-        }
-
-        if (baseUrl != null && defaultUrl.contains("${baseUrl}")) {
-            defaultUrl = defaultUrl.replace("${baseUrl}", baseUrl);
-        }
 
         for (int i = 1; ; i++) {
             String type = getServletConfig().getInitParameter("mapping." + i + ".type");
@@ -83,10 +73,8 @@ public class SimpleProxyServlet extends HttpServlet {
         }
 
         if (targetUrl == null) {
-            String proxyPath = req.getPathInfo();
-            String base = defaultUrl.endsWith("/") ? defaultUrl.substring(0, defaultUrl.length() - 1) : defaultUrl;
-            String path = proxyPath != null ? proxyPath : "";
-            targetUrl = base + "/" + path + (queryString != null ? "?" + queryString : "");
+            resp.sendError(HttpServletResponse.SC_NOT_FOUND);
+            return;
         }
 
 		log("Proxying " + req.getMethod() + " request to: " + targetUrl);
