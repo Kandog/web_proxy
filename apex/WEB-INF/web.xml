@@ -44,27 +44,15 @@
     </init-param>
     <init-param>
         <param-name>mapping.4.type</param-name>
-        <param-value>block</param-value>
-    </init-param>
-    <init-param>
-        <param-name>mapping.4.path</param-name>
-        <param-value>/apex/f?p=4550</param-value>
-    </init-param>
-    <init-param>
-        <param-name>defaultUrl</param-name>
-        <param-value>${baseUrl}/apex/</param-value>
-    </init-param>
-	<init-param>
-        <param-name>mapping.5.type</param-name>
         <param-value>prefix</param-value>
     </init-param>
     <init-param>
-        <param-name>mapping.5.path</param-name>
-        <param-value>/apex/r/amanda/cbi/</param-value>
+        <param-name>mapping.4.path</param-name>
+        <param-value>/kbigo/</param-value>
     </init-param>
     <init-param>
-        <param-name>mapping.5.url</param-name>
-        <param-value>${baseUrl}/apex/r/amanda/cbi/</param-value>
+        <param-name>mapping.4.url</param-name>
+        <param-value>${baseUrl}/kbigo/</param-value>
     </init-param>
   </servlet>
   <servlet-mapping>
