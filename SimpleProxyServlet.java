@@ -55,7 +55,6 @@ public class SimpleProxyServlet extends HttpServlet {
             mappings.add(mapping);
         }
 
-        CookieHandler.setDefault(new CookieManager(null, CookiePolicy.ACCEPT_ALL));
     }
 
     @Override
@@ -94,6 +93,7 @@ public class SimpleProxyServlet extends HttpServlet {
 
 		URL url = new URL(targetUrl);
 		HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+		conn.setInstanceFollowRedirects(false);
 		conn.setRequestMethod(req.getMethod());
 		conn.setDoInput(true);
 		conn.setDoOutput("POST".equalsIgnoreCase(req.getMethod()));
