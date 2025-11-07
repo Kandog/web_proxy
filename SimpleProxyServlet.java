@@ -127,7 +127,11 @@ public class SimpleProxyServlet extends HttpServlet {
 			String headerName = entry.getKey();
 			if (headerName != null && !headerName.equalsIgnoreCase("Transfer-Encoding")) {
 				for (String value : entry.getValue()) {
-					resp.addHeader(headerName, value);
+					if (headerName.equalsIgnoreCase("Location") && (responseCode >= 300 && responseCode < 400)) {
+						resp.addHeader(headerName, rewriteUrl(value, req));
+					} else {
+						resp.addHeader(headerName, value);
+					}
 				}
 			}
 		}
@@ -152,6 +156,35 @@ public class SimpleProxyServlet extends HttpServlet {
 		} else {
 			resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "No response stream available");
 		}
+    }
+
+    private String rewriteUrl(String locationHeader, HttpServletRequest request) {
+        if (locationHeader == null) {
+            return null;
+        }
+
+        try {
+            URL originalUrl = new URL(locationHeader);
+            String proxyHost = request.getServerName();
+            int proxyPort = request.getServerPort();
+            String proxyScheme = request.getScheme();
+
+            // Use -1 for default port
+            if ((proxyScheme.equals("http") && proxyPort == 80) || (proxyScheme.equals("https") && proxyPort == 443)) {
+                proxyPort = -1;
+            }
+
+
+            // Build the rewritten URL using the proxy's host and port
+            URL rewrittenUrl = new URL(proxyScheme, proxyHost, proxyPort, originalUrl.getFile());
+            log("Rewriting redirect Location header to: " + rewrittenUrl.toString());
+            return rewrittenUrl.toString();
+
+        } catch (MalformedURLException e) {
+            // If the location is not a valid URL (e.g., a relative path), just return it as is
+            log("Location header is not a valid URL, passing through: " + locationHeader);
+            return locationHeader;
+        }
     }
 
 }
