@@ -49,7 +49,7 @@ public class SimpleProxyServlet extends HttpServlet {
 
     @Override
     protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        String requestUri = req.getRequestURI();
+        String requestUri = req.getRequestURI().substring(req.getContextPath().length());
         String queryString = req.getQueryString();
         String fullRequestUrl = requestUri + (queryString != null ? "?" + queryString : "");
 
@@ -139,6 +139,11 @@ public class SimpleProxyServlet extends HttpServlet {
                         resp.addHeader(headerName, newLocation);
                     } else {
                         resp.addHeader(headerName, location);
+                    }
+                } else if (headerName.equalsIgnoreCase("Set-Cookie")) {
+                    for (String cookie : entry.getValue()) {
+                        String newCookie = cookie.replaceAll("(?i);\\s*Domain=[^;]*", "");
+                        resp.addHeader(headerName, newCookie);
                     }
                 } else {
 					for (String value : entry.getValue()) {
