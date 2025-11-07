@@ -32,15 +32,15 @@
     </init-param>
     <init-param>
         <param-name>mapping.3.type</param-name>
-        <param-value>contains</param-value>
+        <param-value>prefix</param-value>
     </init-param>
     <init-param>
         <param-name>mapping.3.path</param-name>
-        <param-value>apex/wwv_flow.ajax?</param-value>
+        <param-value>/apex/wwv_flow.ajax</param-value>
     </init-param>
     <init-param>
         <param-name>mapping.3.url</param-name>
-        <param-value>${baseUrl}/apex/wwv_flow.ajax?</param-value>
+        <param-value>${baseUrl}/apex/wwv_flow.ajax</param-value>
     </init-param>
     <init-param>
         <param-name>mapping.4.type</param-name>
