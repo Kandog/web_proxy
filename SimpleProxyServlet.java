@@ -49,7 +49,7 @@ public class SimpleProxyServlet extends HttpServlet {
 
     @Override
     protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        String requestUri = req.getRequestURI();
+        String requestUri = req.getRequestURI().substring(req.getContextPath().length());
         String queryString = req.getQueryString();
         String fullRequestUrl = requestUri + (queryString != null ? "?" + queryString : "");
 
@@ -122,12 +122,33 @@ public class SimpleProxyServlet extends HttpServlet {
 		resp.setStatus(responseCode);
 
 		// Forward response headers (excluding Transfer-Encoding)
+		String backendBaseUrl = getServletConfig().getInitParameter("baseUrl");
 		Map<String, List<String>> responseHeaders = conn.getHeaderFields();
 		for (Map.Entry<String, List<String>> entry : responseHeaders.entrySet()) {
 			String headerName = entry.getKey();
 			if (headerName != null && !headerName.equalsIgnoreCase("Transfer-Encoding")) {
-				for (String value : entry.getValue()) {
-					resp.addHeader(headerName, value);
+				if (headerName.equalsIgnoreCase("Location") && (responseCode == 301 || responseCode == 302 || responseCode == 303 || responseCode == 307 || responseCode == 308)) {
+                    String location = entry.getValue().get(0);
+                    if (location.startsWith(backendBaseUrl)) {
+						String proxyBaseUrl = req.getScheme() + "://" + req.getServerName();
+						if (req.getServerPort() != 80 && req.getServerPort() != 443) {
+							proxyBaseUrl += ":" + req.getServerPort();
+						}
+						proxyBaseUrl += req.getContextPath();
+                        String newLocation = location.replace(backendBaseUrl, proxyBaseUrl);
+                        resp.addHeader(headerName, newLocation);
+                    } else {
+                        resp.addHeader(headerName, location);
+                    }
+                } else if (headerName.equalsIgnoreCase("Set-Cookie")) {
+                    for (String cookie : entry.getValue()) {
+                        String newCookie = cookie.replaceAll("(?i);\\s*Domain=[^;]*", "");
+                        resp.addHeader(headerName, newCookie);
+                    }
+                } else {
+					for (String value : entry.getValue()) {
+						resp.addHeader(headerName, value);
+					}
 				}
 			}
 		}
